@@ -4,7 +4,6 @@
 
 from gesture_estimator import GestureEstimator
 import cv2
-import time
 import os
 from flask import (
     Flask,
@@ -225,7 +224,8 @@ def janken():
 
             if myhand == -1:
                 error_message = "グー、チョキ、パーのジェスチャーを入力してください。"
-                return render_template("index.html", error_message=error_message)
+                return render_template(
+                    "index.html", error_message=error_message)
             # cnt = cnt + 1
             # ここにコンピュータの手の文字列と画像を定義するコードをいれる
             global pre_pc_hand, pc_hand
@@ -242,7 +242,7 @@ def janken():
                 result_msg = "You Win！！"
                 result_img = "./image/kachi.gif"
             else:
-                result_msg = "You Loss..."
+                result_msg = "You Lose..."
                 result_img = "./image/make.gif"
 
             # 次の値をセット
