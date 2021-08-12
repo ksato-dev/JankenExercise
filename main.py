@@ -27,6 +27,9 @@ pre_pc_hand = 0
 pc_hand = 0
 landms_list = None
 
+pre_operation_msg = "以下に勝て"
+operation_msg = pre_operation_msg
+
 
 @app.route("/")
 def index():
@@ -77,9 +80,7 @@ def gen(ges_est):
 @app.route("/video_feed")
 def video_feed():
     ges_est = GestureEstimator()
-    return Response(
-        gen(ges_est), mimetype="multipart/x-mixed-replace; boundary=frame"
-    )
+    return Response(gen(ges_est), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
 def get_hand_img_data(hand):
@@ -96,6 +97,30 @@ def get_hand_img_data(hand):
         ret_hand_img_path = "image/pa.png"
 
     return ret_hand_str, ret_hand_img_path
+
+
+def judge_result(operation_msg, result):
+    you_win = False
+    if operation_msg == "以下に勝て" and result == "勝ち":
+        you_win = True
+    elif operation_msg == "以下に負けろ" and result == "負け":
+        you_win = True
+    elif operation_msg == "以下と引き分けろ" and result == "あいこ":
+        you_win = True
+    return you_win
+
+
+def get_random_operation_msg():
+    rand_val = random.randint(0, 2)
+    operation_msg = None
+    if rand_val == 0:
+        operation_msg = "以下に勝て"
+    elif rand_val == 1:
+        operation_msg = "以下に負けろ"
+    elif rand_val == 2:
+        operation_msg = "以下と引き分けろ"
+    print("operation_msg:", operation_msg)
+    return operation_msg
 
 
 def judge_gu(landms):
@@ -135,6 +160,42 @@ def judge_pa(landms):
         return True
     else:
         return False
+
+
+# 0:gu, 1:choki, 2:pa
+def judge_battle(myhand, pc_hand):
+    if pc_hand == 0:
+        if myhand == 0:
+            result = "あいこ"
+            result_img = "./image/aiko.gif"
+        elif myhand == 1:
+            result = "負け"
+            result_img = "./image/make.gif"
+        elif myhand == 2:
+            result = "勝ち"
+            result_img = "./image/kachi.gif"
+    elif pc_hand == 1:
+        if myhand == 0:
+            result = "勝ち"
+            result_img = "./image/kachi.gif"
+        elif myhand == 1:
+            result = "あいこ"
+            result_img = "./image/aiko.gif"
+        elif myhand == 2:
+            result = "負け"
+            result_img = "./image/make.gif"
+    elif pc_hand == 2:
+        if myhand == 0:
+            result = "負け"
+            result_img = "./image/make.gif"
+        elif myhand == 1:
+            result = "勝ち"
+            result_img = "./image/kachi.gif"
+        elif myhand == 2:
+            result = "あいこ"
+            result_img = "./image/aiko.gif"
+
+    return result, result_img
 
 
 def recognize(curr_img):
@@ -179,51 +240,39 @@ def janken():
             pre_pc_hand = pc_hand
             pre_pc_hand_s, pre_pc_hand_pic = get_hand_img_data(pre_pc_hand)
 
-            # pc_hand = pre_pc_hand
-            if pre_pc_hand == 0:
-                if myhand == 0:
-                    result = "あいこ"
-                    result_img = "./image/aiko.gif"
-                elif myhand == 1:
-                    result = "負け"
-                    result_img = "./image/make.gif"
-                elif myhand == 2:
-                    result = "勝ち"
-                    result_img = "./image/kachi.gif"
-            elif pc_hand == 1:
-                if myhand == 0:
-                    result = "勝ち"
-                    result_img = "./image/kachi.gif"
-                elif myhand == 1:
-                    result = "あいこ"
-                    result_img = "./image/aiko.gif"
-                elif myhand == 2:
-                    result = "負け"
-                    result_img = "./image/make.gif"
-            elif pc_hand == 2:
-                if myhand == 0:
-                    result = "負け"
-                    result_img = "./image/make.gif"
-                elif myhand == 1:
-                    result = "勝ち"
-                    result_img = "./image/kachi.gif"
-                elif myhand == 2:
-                    result = "あいこ"
-                    result_img = "./image/aiko.gif"
+            result, _ = judge_battle(myhand, pre_pc_hand)
+
+            global pre_operation_msg, operation_msg
+            pre_operation_msg = operation_msg
+            result_msg = None
+            result_img = None
+            if judge_result(pre_operation_msg, result):
+                result_msg = "You Win！！"
+                result_img = "./image/kachi.gif"
+            else:
+                result_msg = "You Loss..."
+                result_img = "./image/make.gif"
 
             # 次の値をセット
             pc_hand = random.randint(0, 2)
             pc_hand_s, pc_hand_pic = get_hand_img_data(pc_hand)
+
+            operation_msg = get_random_operation_msg()
+            print(operation_msg)
+
             return render_template(
                 "index.html",
-                result=result,
+                # result=result,
                 result_img=result_img,
+                result_msg=result_msg,
                 myhand_s=myhand_s,
                 myhand_pic=myhand_pic,
                 pc_hand_s=pc_hand_s,
-                pc_hand_pic=pc_hand_pic,
                 pre_pc_hand_s=pre_pc_hand_s,
+                pc_hand_pic=pc_hand_pic,
                 pre_pc_hand_pic=pre_pc_hand_pic,
+                operation_msg=operation_msg,
+                pre_operation_msg=pre_operation_msg,
             )
 
         else:

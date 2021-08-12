@@ -5,7 +5,7 @@ import time
 
 class GestureEstimator:
     def __init__(self):
-        time.sleep(0.5)
+        time.sleep(0.2)  # ディレイ書けないとカメラが認識されにくくなる？
         self.video = cv2.VideoCapture(-1) 
 
         self.mp_hands = mp.solutions.hands
@@ -18,8 +18,6 @@ class GestureEstimator:
 
     def get_frame(self):
         success, image = self.video.read()
-        # ret, jpeg = cv2.imencode('.jpg', image)
-        # return jpeg.tobytes()
         return image
 
         # read()は、二つの値を返すので、success, imageの2つ変数で受けています。

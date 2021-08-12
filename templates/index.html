@@ -21,14 +21,14 @@ font-size: 200%;
 </style>
 
 <body>
-    <h1>コンピューターとじゃんけん</h1>
+    <h1>脳トレじゃんけん</h1>
     <img src="{{ url_for('video_feed') }}">
 
     <div>
-        {% if operation %}
-          <h2><b>{{ operation }}</h2>
-        {% else %}
-          <h2><b>以下に勝て</h2>
+        {% if operation_msg %}
+          <h2><b>お題：{{operation_msg}}</h2>
+        <!-- {% else %}
+          <h2><b>以下に勝て</h2> -->
         {% endif %}
 
 <!--gif--> 
@@ -49,10 +49,16 @@ font-size: 200%;
 <!--勝負結果-->
         <hr>
         <h1>前の結果</h1>
-        {% if result %}
-        <h2>{{result}}<br></h2>
+        {% if result_msg %}
+        <h2>{{result_msg}}<br></h2>
         <img src="{{ result_img }}" style="margin-top: 0px; width: 150px">
         <br>
+        {% endif %}
+
+        {% if pre_operation_msg %}
+          <h2><b>前のお題：{{pre_operation_msg}}</h2>
+        <!-- {% else %}
+          <h2><b>以下に勝て</h2> -->
         {% endif %}
 <!--あなたの手-->
         <center>
