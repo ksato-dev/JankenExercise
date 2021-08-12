@@ -6,7 +6,7 @@ import time
 class GestureEstimator:
     def __init__(self):
         time.sleep(0.2)  # ディレイ書けないとカメラが認識されにくくなる？
-        self.video = cv2.VideoCapture(-1) 
+        self.video = cv2.VideoCapture(-1)
 
         self.mp_hands = mp.solutions.hands
         self.hands = self.mp_hands.Hands(
@@ -17,13 +17,12 @@ class GestureEstimator:
         self.video.release()
 
     def get_frame(self):
-        success, image = self.video.read()
-        return image
-
         # read()は、二つの値を返すので、success, imageの2つ変数で受けています。
         # OpencVはデフォルトでは raw imagesなので JPEGに変換
         # ファイルに保存する場合はimwriteを使用、メモリ上に格納したい時はimencodeを使用
         # cv2.imencode() は numpy.ndarray() を返すので .tobytes() で bytes 型に変換
+        success, image = self.video.read()
+        return image
 
     def get_pose_img(self, src_image):
         query_image = cv2.cvtColor(src_image, cv2.COLOR_BGR2RGB)
@@ -31,14 +30,12 @@ class GestureEstimator:
         ret_flag = False
         ret_img = src_image
         ret_landmarks_list = []
-        # ret_landmarks_list = None
 
         flag1 = results.multi_hand_landmarks is None
         flag2 = results.multi_handedness is None
         if flag1 or flag2:
             return ret_flag, ret_img, ret_landmarks_list
 
-        # tgt_image = copy.deepcopy(src_image)
         tgt_image = src_image
 
         base_width, base_height = src_image.shape[1], src_image.shape[0]

@@ -2,7 +2,6 @@
 # ref2: https://qiita.com/Gyutan/items/1f81afacc7cac0b07526
 # main.py
 
-# from flask import Flask, render_template, Response
 from gesture_estimator import GestureEstimator
 import cv2
 import time
@@ -35,15 +34,11 @@ operation_msg = pre_operation_msg
 def index():
     return render_template("index.html")
 
-    # "/" を呼び出したときには、indexが表示される。
-
 
 # フロントエンドでフォルダを認識させるためのおまじないコード
 SAVE_DIR = "image"
 if not os.path.isdir(SAVE_DIR):
     os.mkdir(SAVE_DIR)
-
-# ここで認識させている
 
 
 @app.route("/image/<path:filepath>")
@@ -52,6 +47,10 @@ def send_js(filepath):
 
 
 def gen(ges_est):
+    # returnではなくジェネレーターのyieldで逐次出力。
+    # Generatorとして働くためにgenとの関数名にしている
+    # Content-Type（送り返すファイルの種類として）multipart/x-mixed-replace を利用。
+    # HTTP応答によりサーバーが任意のタイミングで複数の文書を返し、紙芝居的にレンダリングを切り替えさせるもの。
     while True:
         frame = ges_est.get_frame()
 
@@ -68,13 +67,6 @@ def gen(ges_est):
                 b"--frame\r\n"
                 b"Content-Type: image/jpeg\r\n\r\n" + jpeg.tobytes() + b"\r\n\r\n"
             )
-
-
-# returnではなくジェネレーターのyieldで逐次出力。
-# Generatorとして働くためにgenとの関数名にしている
-# Content-Type（送り返すファイルの種類として）multipart/x-mixed-replace を利用。
-# HTTP応答によりサーバーが任意のタイミングで複数の文書を返し、紙芝居的にレンダリングを切り替えさせるもの。
-# （※以下に解説参照あり）
 
 
 @app.route("/video_feed")
@@ -258,7 +250,7 @@ def janken():
             pc_hand_s, pc_hand_pic = get_hand_img_data(pc_hand)
 
             operation_msg = get_random_operation_msg()
-            print(operation_msg)
+            # print(operation_msg)
 
             return render_template(
                 "index.html",
