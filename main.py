@@ -219,22 +219,21 @@ def janken():
     if request.method == "POST":
         # myhand_img_path = None
         global recog_now, curr_img
+        global pre_pc_hand, pc_hand
+        global pre_operation_msg, operation_msg
         if recog_now:
             myhand, myhand_s, myhand_pic = recognize(curr_img)
 
             if myhand == -1:
-                error_message = "グー、チョキ、パーのジェスチャーを入力してください。"
-                return render_template(
-                    "index.html", error_message=error_message)
+                error_message = "ジェスチャーが認識されませんでした。グー、チョキ、パーのジェスチャーを入力してください。"
+                return render_template("index.html", error_message=error_message)
             # cnt = cnt + 1
             # ここにコンピュータの手の文字列と画像を定義するコードをいれる
-            global pre_pc_hand, pc_hand
             pre_pc_hand = pc_hand
             pre_pc_hand_s, pre_pc_hand_pic = get_hand_img_data(pre_pc_hand)
 
             result, _ = judge_battle(myhand, pre_pc_hand)
 
-            global pre_operation_msg, operation_msg
             pre_operation_msg = operation_msg
             result_msg = None
             result_img = None
@@ -268,8 +267,19 @@ def janken():
             )
 
         else:
+            pre_pc_hand = pc_hand
+            pre_operation_msg = operation_msg
+            pc_hand_s, pc_hand_pic = get_hand_img_data(pre_pc_hand)
+
             error_message = "ジェスチャーが認識されませんでした。グー、チョキ、パーのジェスチャーを入力してください。"
-            return render_template("index.html", error_message=error_message)
+            return render_template(
+                "index.html",
+                error_message=error_message,
+                pc_hand_s=pc_hand_s,
+                pc_hand_pic=pc_hand_pic,
+                operation_msg=operation_msg,
+                pre_operation_msg=pre_operation_msg,
+            )
 
 
 if __name__ == "__main__":
