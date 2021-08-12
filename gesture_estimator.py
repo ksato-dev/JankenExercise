@@ -6,7 +6,7 @@ import time
 class GestureEstimator:
     def __init__(self):
         time.sleep(0.5)
-        self.video = cv2.VideoCapture(-1)  # 適宜変える
+        self.video = cv2.VideoCapture(-1) 
 
         self.mp_hands = mp.solutions.hands
         self.hands = self.mp_hands.Hands(
