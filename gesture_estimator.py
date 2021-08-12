@@ -1,15 +1,16 @@
-
 import mediapipe as mp
 import cv2
+import time
 
-class GestureEstimator():
+
+class GestureEstimator:
     def __init__(self):
-        self.video = cv2.VideoCapture(0)
+        time.sleep(0.5)
+        self.video = cv2.VideoCapture(-1)  # 適宜変える
 
         self.mp_hands = mp.solutions.hands
         self.hands = self.mp_hands.Hands(
-            min_detection_confidence=0.7,
-            min_tracking_confidence=0.5,
+            min_detection_confidence=0.7, min_tracking_confidence=0.5,
         )
 
     def __del__(self):
@@ -27,30 +28,30 @@ class GestureEstimator():
         # cv2.imencode() は numpy.ndarray() を返すので .tobytes() で bytes 型に変換
 
     def get_pose_img(self, src_image):
-        # self.src_image = cv2.imread('samsup.jpg')
-        # self.mp_hands = mp.solutions.hands
-        # self.hands = self.mp_hands.Hands(
-        #     min_detection_confidence=0.7,
-        #     min_tracking_confidence=0.5,
-        # )
         query_image = cv2.cvtColor(src_image, cv2.COLOR_BGR2RGB)
         results = self.hands.process(query_image)
+        ret_flag = False
+        ret_img = src_image
+        ret_landmarks_list = []
+        # ret_landmarks_list = None
 
         flag1 = results.multi_hand_landmarks is None
         flag2 = results.multi_handedness is None
         if flag1 or flag2:
-            return src_image
+            return ret_flag, ret_img, ret_landmarks_list
 
         # tgt_image = copy.deepcopy(src_image)
         tgt_image = src_image
 
         base_width, base_height = src_image.shape[1], src_image.shape[0]
 
-        for hand_landmarks, handedness in zip(results.multi_hand_landmarks, results.multi_handedness):
+        for hand_landmarks, handedness in zip(
+            results.multi_hand_landmarks, results.multi_handedness
+        ):
 
             landmark_buf = []
 
-            # 結果取得★
+            # 結果取得
             # keypoint
             for landmark in hand_landmarks.landmark:
                 x = min(int(landmark.x * base_width), base_width - 1)
@@ -60,10 +61,16 @@ class GestureEstimator():
 
             # connection line
             for con_pair in mp.solutions.hands.HAND_CONNECTIONS:
-                cv2.line(tgt_image, landmark_buf[con_pair[0].value],
-                         landmark_buf[con_pair[1].value], (255, 0, 0), 2)
+                cv2.line(
+                    tgt_image,
+                    landmark_buf[con_pair[0].value],
+                    landmark_buf[con_pair[1].value],
+                    (255, 0, 0),
+                    2,
+                )
 
-        return tgt_image
-        # cv2.imshow("gesture with frame nodes", tgt_image)
-        # cv2.waitKey(2000)
+            ret_landmarks_list.append(landmark_buf)
 
+        ret_flag = True
+        ret_img = tgt_image
+        return ret_flag, ret_img, ret_landmarks_list

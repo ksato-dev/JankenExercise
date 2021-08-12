@@ -1,11 +1,78 @@
-<html>
-  <head>
-    <title>Handestimating Demonstration in Realtime</title>
-  </head>
-  <body>
-    <h1>Handestimating Demonstration in Realtime</h1>
-    <img src="{{ url_for('video_feed') }}">
-    <!-- jinja2のテンプレートの書き方です。/video_feedを呼び出しています。 -->
-  </body>
-</html>
+<!DOCTYPE html>
+<html lang="ja">
 
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Handestimating Demonstration in Realtime</title>
+</head>
+
+<br>
+<div style="text-align:center;">
+<header><b><font size="7">Janken using Web-Cam</font></b></header>
+</div>
+
+<style type="text/css">
+input, select, textarea {
+font-size: 200%;
+}
+</style>
+
+<body>
+    <h1>コンピューターとじゃんけん</h1>
+    <img src="{{ url_for('video_feed') }}">
+
+    <div>
+        {% if operation %}
+          <h2><b>{{ operation }}</h2>
+        {% else %}
+          <h2><b>以下に勝て</h2>
+        {% endif %}
+
+<!--gif--> 
+        {% if pc_hand_pic %}
+          <img src={{pc_hand_pic}} alt="janken_ope" style="width: 150px;">
+        {% else %}
+          <img src="image/gu.png" alt="janken_ope" style="width: 150px;">
+        {% endif %}
+<!--自分の手の入力部分-->
+        <form action = "janken_core" method = "POST" enctype = "multipart/form-data">
+            <input type = "submit" value="勝負！">
+        </form>
+    </div>
+    {% if error_message %}
+        <hr>
+        <h2><b>{{ error_message }}</b></h2>
+    {% endif %}
+<!--勝負結果-->
+        <hr>
+        <h1>前の結果</h1>
+        {% if result %}
+        <h2>{{result}}<br></h2>
+        <img src="{{ result_img }}" style="margin-top: 0px; width: 150px">
+        <br>
+        {% endif %}
+<!--あなたの手-->
+        <center>
+        <table>
+            <td>
+                {% if myhand_s %}
+                <p>あなた: {{myhand_s}}</p>
+                <img src="{{ myhand_pic }}" style="margin-top: 0px; vertical-align: bottom; width: 150px">
+                {% endif %}
+            </td>
+<!--コンピューターの手-->
+            <td>
+                {% if pre_pc_hand_s %}
+                <p>コンピュータ: {{pre_pc_hand_s}}</p>
+                <img src="{{ pre_pc_hand_pic }}" style="margin-top: 0px; vertical-align: bottom; width: 150px">
+                {% endif %}
+            </td>
+        </table>
+        </center>
+    <small>&copy; 2021 Studio Coforest.</small>
+</body>
+
+</html>
