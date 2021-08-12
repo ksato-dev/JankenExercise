@@ -9,10 +9,10 @@
     <title>Handestimating Demonstration in Realtime</title>
 </head>
 
-<br>
+<!-- <br>
 <div style="text-align:center;">
 <header><b><font size="7">Janken using Web-Cam</font></b></header>
-</div>
+</div> -->
 
 <style type="text/css">
 input, select, textarea {
@@ -48,9 +48,9 @@ font-size: 200%;
     {% endif %}
 <!--勝負結果-->
         <hr>
-        <h1>前の結果</h1>
+        <!-- <h1>前の結果</h1> -->
         {% if result_msg %}
-        <h2>{{result_msg}}<br></h2>
+        <h2>前の結果：{{result_msg}}<br></h2>
         <img src="{{ result_img }}" style="margin-top: 0px; width: 150px">
         <br>
         {% endif %}
