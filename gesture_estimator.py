@@ -5,7 +5,7 @@ import time
 
 class GestureEstimator:
     def __init__(self):
-        time.sleep(0.2)  # ディレイ書けないとカメラが認識されにくくなる？
+        time.sleep(0.1)  # ディレイ書けないとカメラが認識されにくくなる？
         self.video = cv2.VideoCapture(-1)
 
         self.mp_hands = mp.solutions.hands
@@ -18,7 +18,7 @@ class GestureEstimator:
 
     def get_frame(self):
         # read()は、二つの値を返すので、success, imageの2つ変数で受けています。
-        # OpencVはデフォルトでは raw imagesなので JPEGに変換
+        # OpenCVはデフォルトでは raw imagesなので JPEGに変換
         # ファイルに保存する場合はimwriteを使用、メモリ上に格納したい時はimencodeを使用
         # cv2.imencode() は numpy.ndarray() を返すので .tobytes() で bytes 型に変換
         success, image = self.video.read()
@@ -69,3 +69,61 @@ class GestureEstimator:
         ret_flag = True
         ret_img = tgt_image
         return ret_flag, ret_img, ret_landmarks_list
+
+    @classmethod
+    def _judge_gu(cls, landms):
+        # thumb = landms[1][1] > landms[2][1] > landms[3][1] > landms[4][1]
+        index = landms[6][1] < landms[7][1] < landms[8][1]
+        middle = landms[10][1] < landms[11][1] < landms[12][1]
+        ring = landms[14][1] < landms[15][1] < landms[16][1]
+        little = landms[18][1] < landms[19][1] < landms[20][1]
+        print(index, middle, ring, little)
+        if index and middle and ring and little:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def _judge_choki(cls, landms):
+        # thumb = landms[1][1] > landms[2][1] > landms[3][1] > landms[4][1]
+        index = landms[5][1] > landms[6][1] > landms[7][1] > landms[8][1]
+        middle = landms[9][1] > landms[10][1] > landms[11][1] > landms[12][1]
+        ring = landms[14][1] < landms[15][1] < landms[16][1]
+        little = landms[18][1] < landms[19][1] < landms[20][1]
+        print(index, middle, ring, little)
+        if index and middle and ring and little:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def _judge_pa(cls, landms):
+        # thumb = landms[1][1] > landms[2][1] > landms[3][1] > landms[4][1]
+        index = landms[5][1] > landms[6][1] > landms[7][1] > landms[8][1]
+        middle = landms[9][1] > landms[10][1] > landms[11][1] > landms[12][1]
+        ring = landms[13][1] > landms[14][1] > landms[15][1] > landms[16][1]
+        little = landms[17][1] > landms[18][1] > landms[19][1] > landms[20][1]
+        print(index, middle, ring, little)
+        if index and middle and ring and little:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def recognize(cls, landms_list, curr_img):
+        # global landms_list
+        ret_your_hand = None
+        for landms in landms_list:
+            if cls._judge_gu(landms):
+                ret_your_hand = 0
+                break
+            if cls._judge_choki(landms):
+                ret_your_hand = 1
+                break
+            elif cls._judge_pa(landms):
+                ret_your_hand = 2
+                break
+            else:
+                ret_your_hand = -1
+
+        return ret_your_hand
