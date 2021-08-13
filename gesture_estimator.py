@@ -5,7 +5,7 @@ import time
 
 class GestureEstimator:
     def __init__(self):
-        time.sleep(0.1)  # ディレイ書けないとカメラが認識されにくくなる？
+        time.sleep(0.2)  # ディレイ書けないとカメラが認識されにくくなる？
         self.video = cv2.VideoCapture(-1)
 
         self.mp_hands = mp.solutions.hands
