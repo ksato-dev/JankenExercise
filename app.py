@@ -2,6 +2,7 @@
 # ref2: https://qiita.com/Gyutan/items/1f81afacc7cac0b07526
 # main.py
 
+from base64 import encode
 from gesture_estimator import GestureEstimator
 import cv2
 import os
@@ -63,9 +64,33 @@ def gen(ges_est):
             recog_now = ret_flag
             curr_img = jpeg
 
+            # Overlap judge-result-image on jpeg.
+            vis_jpeg = jpeg
+            myhand = GestureEstimator.recognize(landms_list)
+            if landms_list and myhand != -1:
+                print("landms_list:", landms_list)
+                print("myhand:", myhand)
+                _, myhand_pic = get_hand_img_data(myhand)
+                # print("myhand_pic:", myhand_pic)
+                myhand_pic_img = cv2.imread(myhand_pic)
+                myhand_pic_img = cv2.resize(
+                    myhand_pic_img, dsize=None, fx=0.5, fy=0.5)
+                cv2.putText(myhand_pic_img, text="Your hand", org=(
+                    5, 15), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                    fontScale=0.45,
+                    color=(0, 255, 0),
+                    thickness=1,
+                    lineType=cv2.LINE_4)
+                temp_vis_jpeg = frame
+                src_h = myhand_pic_img.shape[0]
+                src_w = myhand_pic_img.shape[1]
+                tgt_h = frame.shape[0]
+                temp_vis_jpeg[tgt_h-src_h:tgt_h, 0:src_w] = myhand_pic_img
+                _, vis_jpeg = cv2.imencode(".jpg", temp_vis_jpeg)
+
             yield (
                 b"--frame\r\n"
-                b"Content-Type: image/jpeg\r\n\r\n" + jpeg.tobytes() + b"\r\n\r\n"
+                b"Content-Type: image/jpeg\r\n\r\n" + vis_jpeg.tobytes() + b"\r\n\r\n"
             )
 
 
@@ -162,8 +187,8 @@ def janken():
         global pre_operation_msg, operation_msg
         global landms_list
         if recog_now:
-            print(curr_img)
-            myhand = GestureEstimator.recognize(landms_list, curr_img)
+            # print(curr_img)
+            myhand = GestureEstimator.recognize(landms_list)
             myhand_s, myhand_pic = get_hand_img_data(myhand)
 
             if myhand == -1:
@@ -207,7 +232,7 @@ def janken():
 
         else:
             pre_pc_hand = pc_hand
-            print(pre_pc_hand)
+            # print(pre_pc_hand)
             pre_operation_msg = operation_msg
             pc_hand_s, pc_hand_pic = get_hand_img_data(pre_pc_hand)
 

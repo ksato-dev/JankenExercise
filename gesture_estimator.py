@@ -110,7 +110,7 @@ class GestureEstimator:
             return False
 
     @classmethod
-    def recognize(cls, landms_list, curr_img):
+    def recognize(cls, landms_list):
         # global landms_list
         ret_your_hand = None
         for landms in landms_list:
