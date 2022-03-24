@@ -68,8 +68,6 @@ def gen(ges_est):
             vis_jpeg = jpeg
             myhand = GestureEstimator.recognize(landms_list)
             if landms_list and myhand != -1:
-                print("landms_list:", landms_list)
-                print("myhand:", myhand)
                 _, myhand_pic = get_hand_img_data(myhand)
                 # print("myhand_pic:", myhand_pic)
                 myhand_pic_img = cv2.imread(myhand_pic)

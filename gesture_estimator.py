@@ -5,7 +5,7 @@ import time
 
 class GestureEstimator:
     def __init__(self):
-        time.sleep(0.2)  # ディレイ書けないとカメラが認識されにくくなる？
+        time.sleep(1.0)  # ディレイ書けないとカメラが認識されにくくなる？
         self.video = cv2.VideoCapture(-1)
 
         self.mp_hands = mp.solutions.hands
@@ -77,7 +77,7 @@ class GestureEstimator:
         middle = landms[10][1] < landms[11][1] < landms[12][1]
         ring = landms[14][1] < landms[15][1] < landms[16][1]
         little = landms[18][1] < landms[19][1] < landms[20][1]
-        print(index, middle, ring, little)
+        # print(index, middle, ring, little)
         if index and middle and ring and little:
             return True
         else:
@@ -90,7 +90,7 @@ class GestureEstimator:
         middle = landms[9][1] > landms[10][1] > landms[11][1] > landms[12][1]
         ring = landms[14][1] < landms[15][1] < landms[16][1]
         little = landms[18][1] < landms[19][1] < landms[20][1]
-        print(index, middle, ring, little)
+        # print(index, middle, ring, little)
         if index and middle and ring and little:
             return True
         else:
@@ -103,7 +103,7 @@ class GestureEstimator:
         middle = landms[9][1] > landms[10][1] > landms[11][1] > landms[12][1]
         ring = landms[13][1] > landms[14][1] > landms[15][1] > landms[16][1]
         little = landms[17][1] > landms[18][1] > landms[19][1] > landms[20][1]
-        print(index, middle, ring, little)
+        # print(index, middle, ring, little)
         if index and middle and ring and little:
             return True
         else:
